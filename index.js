@@ -25,7 +25,7 @@ const WHILE_TYPING = 'whileTyping';
 
 const ACTIVE_DURATION = 250;
 
-var config = {
+var hyperCatConfig = {
   staggerHeight: 2,
   rainbowMaxAlpha: 1,
   audioEnabled: WHILE_TYPING,
@@ -43,11 +43,11 @@ const pauseAudio = () => {
 };
 
 exports.decorateTerm = (Term, { React, notify }) => {
-  // There might be a better way to get this config. Nyan on.
-  config = Object.assign(config, electron.remote.app.config.getConfig().hyperCat);
 
   return class extends React.Component {
     constructor (props, context) {
+      // a better way to get the config. Nyan on.
+      hyperCatConfig = Object.assign({}, hyperCatConfig, config.getConfig().hyperCat)
       super(props, context);
       this.state = {
         videoActive: false
@@ -98,7 +98,7 @@ exports.decorateTerm = (Term, { React, notify }) => {
 
       this._isStaggeredUp = !this._isStaggeredUp;
 
-      const staggerTop = top + (this._isStaggeredUp ? -config.staggerHeight : config.staggerHeight);
+      const staggerTop = top + (this._isStaggeredUp ? -hyperCatConfig.staggerHeight : hyperCatConfig.staggerHeight);
 
       Object.assign(this._catCursor.style, {
         left: left + 'px',
@@ -216,7 +216,7 @@ exports.decorateTerm = (Term, { React, notify }) => {
         ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${rainbow.alpha})`;
         ctx.fillRect(
           rainbow.left,
-          rainbow.top + stripeHeight * i + (staggerUp ? -config.staggerHeight : config.staggerHeight),
+          rainbow.top + stripeHeight * i + (staggerUp ? -hyperCatConfig.staggerHeight : hyperCatConfig.staggerHeight),
           rainbow.width,
           stripeHeight
         );
@@ -246,7 +246,7 @@ exports.decorateTerm = (Term, { React, notify }) => {
 
     spawnRainbow(rect) {
       // Make the rainbow a bit shorter than the cat for a proper nyan.
-      this._rainbows.push(Object.assign({ alpha: config.rainbowMaxAlpha }, {
+      this._rainbows.push(Object.assign({ alpha: hyperCatConfig.rainbowMaxAlpha }, {
         left: rect.left,
         top: rect.top + rect.height * .1,
         width: rect.width,
@@ -273,12 +273,12 @@ exports.decorateTerm = (Term, { React, notify }) => {
     }
 
     updateAudio(typing) {
-      let active = config.audioEnabled === true || (typing && config.audioEnabled === WHILE_TYPING);
+      let active = hyperCatConfig.audioEnabled === true || (typing && hyperCatConfig.audioEnabled === WHILE_TYPING);
       active ? playAudio() : pauseAudio();
     }
 
     updateVisual(typing) {
-      let active = config.videoEnabled === true || (typing && config.videoEnabled === WHILE_TYPING);
+      let active = hyperCatConfig.videoEnabled === true || (typing && hyperCatConfig.videoEnabled === WHILE_TYPING);
       this._overlay.classList.toggle('hypercat-active', active);
       this.setState({
         videoActive: active
